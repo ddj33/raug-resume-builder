@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink-50 text-ink-900 antialiased;
+  font-feature-settings: "ss01", "ss02", "cv11";
+}
+
+::selection {
+  @apply bg-brand-200 text-ink-900;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm font-medium text-ink-800 shadow-sm transition hover:bg-ink-50 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-ink-700 transition hover:bg-ink-100;
+  }
+  .input,
+  .textarea,
+  .select {
+    @apply w-full rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm text-ink-900 shadow-sm transition placeholder:text-ink-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-500;
+  }
+  .card {
+    @apply rounded-2xl border border-ink-200 bg-white shadow-card;
+  }
+  .card-header {
+    @apply flex items-center justify-between gap-3 border-b border-ink-100 px-5 py-4;
+  }
+  .card-body {
+    @apply px-5 py-4;
+  }
+  .h1 {
+    @apply text-2xl font-bold tracking-tight text-ink-900;
+  }
+  .h2 {
+    @apply text-lg font-semibold text-ink-900;
+  }
+  .muted {
+    @apply text-sm text-ink-500;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full bg-ink-100 px-2.5 py-1 text-xs font-medium text-ink-700;
+  }
+}

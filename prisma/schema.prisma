@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CandidateProfile {
+  id              String   @id @default(cuid())
+  fullName        String
+  headline        String
+  location        String
+  email           String
+  phone           String?
+  linkedinUrl     String?
+  githubUrl       String?
+  portfolioUrl    String?
+  school          String
+  program         String
+  degree          String
+  graduation      String
+  summary         String
+  preferredRoles  String   // comma-separated: "AI, Product, Software, Fintech"
+  preferredTypes  String   // comma-separated: "Internship, Full-time"
+  workAuth        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  experiences Experience[]
+  projects    Project[]
+  skills      Skill[]
+  courses     Course[]
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  profileId   String
+  company     String
+  title       String
+  location    String?
+  startDate   String
+  endDate     String?
+  description String   // 1-3 paragraphs of context
+  highlights  String   // newline-separated bullets
+  tags        String   // comma-separated tech / themes
+  createdAt   DateTime @default(now())
+
+  profile CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  profileId   String
+  name        String
+  role        String?
+  link        String?
+  description String
+  highlights  String   // newline-separated bullets
+  tags        String   // comma-separated tech / themes
+  createdAt   DateTime @default(now())
+
+  profile CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  profileId String
+  name      String
+  category  String   // "Languages", "AI/ML", "Product", "Design", etc.
+  level     String?  // "Expert", "Proficient", "Familiar"
+  createdAt DateTime @default(now())
+
+  profile CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  profileId   String
+  code        String?
+  name        String
+  term        String?
+  description String
+  tags        String   // comma-separated themes
+  createdAt   DateTime @default(now())
+
+  profile CandidateProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  title       String
+  company     String
+  location    String?
+  url         String?
+  roleType    String?  // "Internship", "Full-time", "Contract"
+  description String
+  notes       String?
+  contactName  String?
+  contactEmail String?
+  contactRole  String?
+  status      String   @default("saved") // saved, applying, applied, contacted, interviewing, rejected, offer
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  analysis JobAnalysis?
+  messages GeneratedMessage[]
+}
+
+model JobAnalysis {
+  id            String   @id @default(cuid())
+  jobId         String   @unique
+  fitScore      Int
+  summary       String   // tailored resume summary
+  strengths     String   // JSON string array of "why this matches"
+  risks         String   // JSON string array of risks / missing skills
+  angle         String   // best application angle (1-3 sentences)
+  bullets       String   // JSON string array of tailored bullets
+  retrieved     String   // JSON of retrieval result (top items with scores)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model GeneratedMessage {
+  id         String   @id @default(cuid())
+  jobId      String
+  kind       String   // "recruiter_email", "linkedin_note", "linkedin_dm", "followup_48h", "followup_7d"
+  subject    String?
+  body       String
+  groundedIn String   @default("[]") // JSON array of evidence ids referenced
+  createdAt  DateTime @default(now())
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  title     String        @default("New chat")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String   // "user" | "assistant"
+  content   String
+  intent    String?  // detected intent for assistant turns
+  evidence  String   @default("[]") // JSON array of retrieved facts the answer was grounded in
+  createdAt DateTime @default(now())
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
